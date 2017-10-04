@@ -61,6 +61,7 @@ Program DiskTest;
  
  
  By James Pearce, lo-tech.co.uk
+ Modified by Foone Turing, foone.org
  
  v1.0 - 06-May-10
         - Initial build 32K read and write and 8k random
@@ -160,6 +161,9 @@ v2.3 - 04-May-12
 	- Added RAM test to the pattern test routine.
 	- Added 'noprogress' switch to surpress screen progress marks on
 	  performance tests.
+
+v2.4 - 04-Oct-17
+  - Delete test file at end of test
 }
  
  
@@ -188,7 +192,7 @@ CONST
   PatternNames      : Array[1..10] of String[10] =
                       ('','','','','','','','','Walking 1s','Walking 0s');
   PowerPatterns     : Array[1..2] of Word = ($55AA,$AA55);
-  VERSION           : String = '2.3';
+  VERSION           : String = '2.4';
   DisplayCodesCount : Byte = 4;
   DisplayCodes      : Array[1..4] of Char = ('-','\','|','/');
  
@@ -408,6 +412,15 @@ begin
   Truncate(f);
   Close(f);
 end;{procedure PurgeTestFile}
+
+procedure DeleteTestFile;
+{deletes the test file}
+var f : file;
+begin
+  WriteLn('Deleting ', FName, '.');
+  Assign(f,FName);
+  Erase(f);
+end;{procedure DeleteTestFile}
  
  
 function CheckTestFile : LongInt;
@@ -996,7 +1009,7 @@ VAR
   TestDone      :  Boolean;
  
 BEGIN
-  WriteLn('DiskTest, by James Pearce.  Version ', VERSION);
+  WriteLn('DiskTest, by James Pearce & Foone Turing.  Version ', VERSION);
   If ParamSpecified('/h') or ParamSpecified('-h') or
      ParamSpecified('/?') or ParamSpecified('-?') then
   begin
@@ -1134,5 +1147,11 @@ BEGIN
       WriteLn(' overhead), is ',(1000/IOPS):2:0,' ms.');
       WriteLn;
     end;{if not TestDone}
+
+    if Not ReadOnly then
+    begin
+      DeleteTestFile
+    end;{if not ReadOnly}
+
   end;{if/else}
 END.{PROGRAM}
